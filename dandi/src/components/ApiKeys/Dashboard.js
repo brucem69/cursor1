@@ -17,7 +17,7 @@ export function Dashboard() {
       await createApiKey(name);
       setIsModalOpen(false);
       showNotification('API Key created successfully', 'success');
-    } catch (error) {
+    } catch {
       showNotification('Error creating API Key', 'error');
     }
   };
@@ -26,7 +26,7 @@ export function Dashboard() {
     try {
       await deleteApiKey(id);
       showNotification('API Key deleted successfully', 'success');
-    } catch (error) {
+    } catch {
       showNotification('Error deleting API Key', 'error');
     }
   };
@@ -38,7 +38,7 @@ export function Dashboard() {
         showNotification('API Key updated successfully', 'success');
       }
       return result;
-    } catch (error) {
+    } catch {
       showNotification('Error updating API Key', 'error');
       return { success: false };
     }

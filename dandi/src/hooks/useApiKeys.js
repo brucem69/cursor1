@@ -31,7 +31,7 @@ export function useApiKeys() {
 
   const createApiKey = async (name) => {
     try {
-      const value = `tvly-${uuidv4()}`;
+      const value = `dandi-${uuidv4()}`;
       const { data, error } = await supabase
         .from('api_keys')
         .insert([{ name, value, usage: 0 }])
