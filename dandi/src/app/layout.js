@@ -2,8 +2,8 @@ import { Providers } from '@/providers';
 import './globals.css';
 
 export const metadata = {
-  title: 'Dandi App',
-  description: 'API Key Management',
+  title: 'Dandi',
+  description: 'API Management Platform',
 };
 
 export default function RootLayout({ children }) {

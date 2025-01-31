@@ -17,17 +17,14 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Overlay dla mobilnej wersji */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
-          onClick={() => toggleSidebar()}
-        />
-      )}
-      
+      <div 
+        className={`fixed inset-0 bg-black/50 transition-opacity lg:hidden
+          ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={toggleSidebar}
+      />
       <aside 
         className={`fixed top-0 left-0 h-full w-64 bg-white border-r transform transition-transform duration-200 ease-in-out z-30
-          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="h-16 flex items-center px-6 border-b">
           <span className="text-xl font-semibold">Dandi</span>
