@@ -3,6 +3,7 @@
 import { Sidebar } from './Sidebar';
 import { SidebarToggle } from './SidebarToggle';
 import { useSidebar } from '@/contexts/SidebarContext';
+import { DevHelper } from './DevHelper';
 
 export function AppLayout({ children }) {
   const { isOpen } = useSidebar();
@@ -20,6 +21,7 @@ export function AppLayout({ children }) {
           {children}
         </main>
       </div>
+      <DevHelper />
     </div>
   );
 } 

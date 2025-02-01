@@ -54,7 +54,7 @@ export function Dashboard() {
       <Overview usage={24} limit={1000} />
       
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">API Keys</h1>
+        <h1 className="text-2xl font-bold">API_ Keys</h1>
         <button
           onClick={() => setIsModalOpen(true)}
           className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
