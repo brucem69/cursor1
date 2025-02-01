@@ -1,8 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverActions: true
-  }
+  // Usuwamy experimental.serverActions, ponieważ jest to już domyślnie włączone w Next.js 14
+  // i powoduje ostrzeżenie
 }
 
 module.exports = nextConfig 
