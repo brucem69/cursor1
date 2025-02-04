@@ -7,11 +7,8 @@ export const useApiKeyState = () => {
   const [apiKey, setApiKey] = useState('');
 
   useEffect(() => {
-    // Pobierz API key z cookies przy montowaniu komponentu
-    const storedApiKey = Cookies.get('api-key');
-    if (storedApiKey) {
-      setApiKey(storedApiKey);
-    }
+    const storedKey = Cookies.get('api-key');
+    if (storedKey) setApiKey(storedKey);
   }, []);
 
   const setStoredApiKey = (key) => {
