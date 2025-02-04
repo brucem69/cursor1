@@ -11,7 +11,7 @@ export function PlaygroundContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { showNotification } = useNotification();
-  const { validateApiKey, validating } = useApiKeyValidation();
+  const { validateApiKey } = useApiKeyValidation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,9 +19,9 @@ export function PlaygroundContent() {
 
     setIsSubmitting(true);
     try {
-      const isValid = await validateApiKey(apiKey);
+      const response = await validateApiKey(apiKey);
       
-      if (isValid) {
+      if (response.success) {
         Cookies.set('api-key', apiKey, { path: '/' });
         showNotification('Valid API Key, /protected can be accessed', 'success');
         
@@ -59,11 +59,11 @@ export function PlaygroundContent() {
         </div>
         <button
           type="submit"
-          disabled={isSubmitting || validating}
+          disabled={isSubmitting}
           className={`w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 
-            ${(isSubmitting || validating) ? 'opacity-50 cursor-not-allowed' : ''}`}
+            ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
-          {isSubmitting ? 'Processing...' : validating ? 'Validating...' : 'Submit'}
+          {isSubmitting ? 'Processing...' : 'Submit'}
         </button>
       </form>
     </div>
