@@ -1,18 +1,31 @@
 import { CohereClient } from "cohere-ai";
+import { OutputFixingParser, StructuredOutputParser } from "@langchain/core/output_parsers";
+import { z } from "zod";
 
 // Initialize Cohere client
 const cohere = new CohereClient({ 
   token: process.env.COHERE_API_KEY 
 });
 
+// Define output schema
+const outputSchema = z.object({
+  summary: z.string().describe("A concise summary of the repository"),
+  cool_facts: z.array(z.string()).describe("List of interesting facts and key features")
+});
+
+// Create parser
+const parser = StructuredOutputParser.fromZodSchema(outputSchema);
+
 // Create prompt template
 const SUMMARY_TEMPLATE = `Analyze and summarize this GitHub repository based on its README content:
 
 {readme_content}
 
-Please provide:
-1. A concise summary of the repository
-2. List of key features and interesting facts (start each with "- ")`;
+Format your response as a JSON object with the following structure:
+{
+  "summary": "A concise summary of the repository",
+  "cool_facts": ["fact 1", "fact 2", "fact 3", ...]
+}`;
 
 export async function summarizeReadme(readmeContent) {
   try {
@@ -32,21 +45,14 @@ export async function summarizeReadme(readmeContent) {
       timeout: 8000,  // 8 sekund timeout
     });
     
-    const text = response.generations[0].text;
-    const lines = text.split('\n');
-    
-    // Extract summary and facts
-    const summary = lines.filter(line => !line.startsWith('- ')).join('\n').trim();
-    const cool_facts = lines.filter(line => line.startsWith('- '));
+    // Parse structured output
+    const parsed = await parser.parse(response.generations[0].text);
     
     console.log('Summarization successful');
     
     return {
       success: true,
-      data: {
-        summary,
-        cool_facts
-      }
+      data: parsed
     };
   } catch (error) {
     console.error("Error summarizing README:", error);
