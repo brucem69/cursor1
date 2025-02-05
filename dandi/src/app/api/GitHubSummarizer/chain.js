@@ -18,11 +18,18 @@ export async function summarizeReadme(readmeContent) {
   try {
     console.log('Starting README summarization...');
     
+    // Skróć treść jeśli jest za długa
+    const maxLength = 4000;
+    const truncatedContent = readmeContent.length > maxLength 
+      ? readmeContent.slice(0, maxLength) + '...'
+      : readmeContent;
+    
     const response = await cohere.generate({
       model: 'command',
-      prompt: SUMMARY_TEMPLATE.replace('{readme_content}', readmeContent),
-      max_tokens: 1000,
+      prompt: SUMMARY_TEMPLATE.replace('{readme_content}', truncatedContent),
+      max_tokens: 500,  // Zmniejszamy limit tokenów
       temperature: 0,
+      timeout: 8000,  // 8 sekund timeout
     });
     
     const text = response.generations[0].text;

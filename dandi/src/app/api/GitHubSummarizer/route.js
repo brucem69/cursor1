@@ -18,6 +18,7 @@ export async function POST(request) {
 
     // 2. Pobierz URL z body
     const { githubUrl } = await request.json();
+    console.log('GitHub URL:', githubUrl);
     
     // 3. Walidacja klucza API
     const { data, error } = await supabase
@@ -34,18 +35,17 @@ export async function POST(request) {
       }, { status: 401 });
     }
 
-    // 4. If API key is valid, process the request
-    console.log('API key valid, processing GitHub URL:', githubUrl);
-    
+    // 4. Pobierz README
     const readmeResult = await getReadmeContent(githubUrl);
     if (!readmeResult.success) {
+      console.error('Failed to fetch README:', readmeResult.error);
       return Response.json({ 
         success: false, 
         message: readmeResult.error 
       }, { status: 400 });
     }
 
-    // Get summary using LangChain
+    // 5. Podsumuj README
     const summaryResult = await summarizeReadme(readmeResult.content);
     if (!summaryResult.success) {
       return Response.json({ 
@@ -54,17 +54,9 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
-    const summary = {
-      url: githubUrl,
-      readme: readmeResult.content,
-      summary: summaryResult.data.summary,
-      cool_facts: summaryResult.data.cool_facts
-    };
-
-    // 5. Zwróć wynik
     return Response.json({ 
       success: true, 
-      data: summary,
+      data: summaryResult.data,
       message: 'GitHub repository processed successfully' 
     }, { status: 200 });
 
@@ -75,10 +67,10 @@ export async function POST(request) {
       message: 'Invalid request' 
     }, { status: 400 });
   }
-} 
+}
+
 async function getReadmeContent(githubUrl) {
   try {
-    // Transform URL to GitHub API format
     const urlParts = new URL(githubUrl).pathname.split('/').filter(Boolean);
     const owner = urlParts[0];
     const repo = urlParts[1];
@@ -87,13 +79,19 @@ async function getReadmeContent(githubUrl) {
     console.log('Requesting GitHub API:', readmeUrl);
     console.log('With token:', process.env.GITHUB_TOKEN ? 'Token present' : 'No token');
 
-    // Fetch README content with GitHub token
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
     const response = await fetch(readmeUrl, {
       headers: {
         'Authorization': `token ${process.env.GITHUB_TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json'
-      }
+        'Accept': 'application/vnd.github.v3+json',
+        'X-GitHub-Api-Version': '2022-11-28'
+      },
+      signal: controller.signal
     });
+
+    clearTimeout(timeout);
     
     if (!response.ok) {
       const errorText = await response.text();
@@ -103,18 +101,12 @@ async function getReadmeContent(githubUrl) {
     }
     
     const data = await response.json();
-    
-    // Decode content from base64
     const content = Buffer.from(data.content, 'base64').toString('utf-8');
-    
-    // Log the content
-    console.log('README Content:', content);
     
     return {
       success: true,
-      content: content
+      content
     };
-
   } catch (error) {
     console.error('Error fetching README:', error);
     return {
@@ -123,6 +115,11 @@ async function getReadmeContent(githubUrl) {
     };
   }
 }
+
+console.log('Environment variables:', {
+  GITHUB_TOKEN: process.env.GITHUB_TOKEN?.slice(0,10) + '...',
+  NODE_ENV: process.env.NODE_ENV
+});
 
 
 
