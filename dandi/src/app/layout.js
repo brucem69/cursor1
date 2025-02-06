@@ -1,4 +1,5 @@
 import { Providers } from '@/providers';
+import { AuthProvider } from '@/components/AuthProvider';
 import './globals.css';
 
 export const metadata = {
@@ -11,9 +12,11 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head />
       <body suppressHydrationWarning={true}>
-        <Providers>
-          {children}
-        </Providers>
+        <AuthProvider>
+          <Providers>
+            {children}
+          </Providers>
+        </AuthProvider>
       </body>
     </html>
   );

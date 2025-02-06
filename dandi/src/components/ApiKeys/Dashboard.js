@@ -1,16 +1,30 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ApiKeysTable } from './ApiKeysTable';
 import { CreateApiKeyModal } from './CreateApiKeyModal';
 import { Overview } from '@/components/Overview';
 import { useApiKeys } from '@/hooks/useApiKeys';
 import { useNotification } from '@/contexts/NotificationContext';
+import { useSession } from "next-auth/react";
+import { useRouter } from 'next/navigation';
 
 export function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { apiKeys, createApiKey, deleteApiKey, updateApiKey } = useApiKeys();
   const { showNotification } = useNotification();
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/');
+    }
+  }, [status, router]);
+
+  if (status === 'loading') {
+    return <div>Loading...</div>;
+  }
 
   const handleCreate = async (name) => {
     try {
